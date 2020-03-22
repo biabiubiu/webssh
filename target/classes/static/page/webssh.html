@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+    <title>WebSSH</title>
+    <link rel="stylesheet" href="../css/xterm.css" />
+</head>
+<body>
+<div id="terminal" style="width: 100%;height: 100%"></div>
+
+<script src="../js/jquery-3.4.1.min.js"></script>
+<script src="../js/xterm.js" charset="utf-8"></script>
+<script src="../js/webssh.js" charset="utf-8"></script>
+<script>
+    openTerminal( {
+        operate:'connect',
+        host: '192.168.0.182',//IP
+        port: '22',//绔彛鍙�
+        username: 'root',//鐢ㄦ埛鍚�
+        password: 'Zw55350002'//瀵嗙爜
+    });
+    function openTerminal(options){
+        var client = new WSSHClient();
+        var term = new Terminal({
+            cols: 97,
+            rows: 37,
+            cursorBlink: true, // 鍏夋爣闂儊
+            cursorStyle: "block", // 鍏夋爣鏍峰紡  null | 'block' | 'underline' | 'bar'
+            scrollback: 800, //鍥炴粴
+            tabStopWidth: 8, //鍒惰〃瀹藉害
+            screenKeys: true
+        });
+
+        term.on('data', function (data) {
+            //閿洏杈撳叆鏃剁殑鍥炶皟鍑芥暟
+            client.sendClientData(data);
+        });
+        term.open(document.getElementById('terminal'));
+        //鍦ㄩ〉闈笂鏄剧ず杩炴帴涓�...
+        term.write('Connecting...');
+        //鎵ц杩炴帴鎿嶄綔
+        client.connect({
+            onError: function (error) {
+                //杩炴帴澶辫触鍥炶皟
+                term.write('Error: ' + error + '\r\n');
+            },
+            onConnect: function () {
+                //杩炴帴鎴愬姛鍥炶皟
+                client.sendInitData(options);
+            },
+            onClose: function () {
+                //杩炴帴鍏抽棴鍥炶皟
+                term.write("\rconnection closed");
+            },
+            onData: function (data) {
+                //鏀跺埌鏁版嵁鏃跺洖璋�
+                term.write(data);
+            }
+        });
+    }
+</script>
+</body>
+</html>
