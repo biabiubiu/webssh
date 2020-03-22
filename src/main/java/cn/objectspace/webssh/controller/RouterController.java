@@ -7,6 +7,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class RouterController {
     @RequestMapping("/websshpage")
     public String websshpage(){
+        return "webssh2";
+    }
+    @RequestMapping("/initSession")
+    public String initSession(){
+        return "initSession";
+    }
+    @RequestMapping("/shell")
+    public String shell(){
         return "webssh";
     }
 }

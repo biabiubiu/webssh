@@ -11,49 +11,60 @@
 <script src="../js/xterm.js" charset="utf-8"></script>
 <script src="../js/webssh.js" charset="utf-8"></script>
 <script>
-    openTerminal( {
-        operate:'connect',
-        host: '192.168.0.182',//IP
-        port: '22',//绔彛鍙�
-        username: 'root',//鐢ㄦ埛鍚�
-        password: 'Zw55350002'//瀵嗙爜
-    });
+	$(document).ready(function(){
+		var id = self.frameElement.getAttribute('data');
+		var paramStr = sessionStorage.getItem(id);
+		var param = JSON.parse(paramStr);
+		openTerminal( {
+	        operate:'connect',
+	        host: param['host'],//IP
+	        port: param['port'],//端口号
+	        username: param['username'],//用户名
+	        password: param['password']//密码
+	    });
+	});
+	
+    
     function openTerminal(options){
         var client = new WSSHClient();
         var term = new Terminal({
             cols: 97,
             rows: 37,
-            cursorBlink: true, // 鍏夋爣闂儊
-            cursorStyle: "block", // 鍏夋爣鏍峰紡  null | 'block' | 'underline' | 'bar'
-            scrollback: 800, //鍥炴粴
-            tabStopWidth: 8, //鍒惰〃瀹藉害
+            cursorBlink: true, // 光标闪烁
+            cursorStyle: "block", // 光标样式  null | 'block' | 'underline' | 'bar'
+            scrollback: 800, //回滚
+            tabStopWidth: 8, //制表宽度
             screenKeys: true
         });
 
         term.on('data', function (data) {
-            //閿洏杈撳叆鏃剁殑鍥炶皟鍑芥暟
+            //键盘输入时的回调函数
             client.sendClientData(data);
         });
         term.open(document.getElementById('terminal'));
-        //鍦ㄩ〉闈笂鏄剧ず杩炴帴涓�...
+        //在页面上显示连接中...
         term.write('Connecting...');
-        //鎵ц杩炴帴鎿嶄綔
+        //执行连接操作
         client.connect({
             onError: function (error) {
-                //杩炴帴澶辫触鍥炶皟
+                //连接失败回调
                 term.write('Error: ' + error + '\r\n');
+                console.log('Error: ' + error + '\r\n');
             },
             onConnect: function () {
-                //杩炴帴鎴愬姛鍥炶皟
+                //连接成功回调
                 client.sendInitData(options);
+                console.log(options);
             },
             onClose: function () {
-                //杩炴帴鍏抽棴鍥炶皟
+                //连接关闭回调
                 term.write("\rconnection closed");
+                console.log("\rconnection closed");
             },
             onData: function (data) {
-                //鏀跺埌鏁版嵁鏃跺洖璋�
+                //收到数据时回调
                 term.write(data);
+                console.log(data);
             }
         });
     }
